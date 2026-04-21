@@ -5,6 +5,13 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
+        // Images are served from DigitalOcean Spaces CDN
+        protocol: 'https',
+        hostname: 'sfo2.digitaloceanspaces.com',
+        pathname: '/cdn.jazzsequence/**',
+      },
+      {
+        // Fallback for any images still on the origin
         protocol: 'https',
         hostname: 'jazzsequence.com',
         pathname: '/wp-content/uploads/**',

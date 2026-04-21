@@ -1,23 +1,15 @@
-name: Clear Pantheon cache after build
+name: Wait for Pantheon build and clear cache
 
 on:
   push:
     branches: [main]
 
 jobs:
-  cache-flush:
+  wait-and-flush:
     runs-on: ubuntu-latest
     steps:
-      - name: Install Terminus
-        run: |
-          curl -L https://github.com/pantheon-systems/terminus/releases/latest/download/terminus.phar -o /usr/local/bin/terminus
-          chmod +x /usr/local/bin/terminus
-
-      - name: Authenticate Terminus
-        run: terminus auth:login --machine-token=${{ secrets.TERMINUS_TOKEN }}
-
-      - name: Wait for Pantheon build
-        run: terminus node:builds:wait devrel-wait-for-build.dev --commit=${{ github.sha }} --max=600
-
-      - name: Clear Pantheon edge cache
-        run: terminus env:clear-cache devrel-wait-for-build.dev
+      - uses: jazzsequence/pantheon-wait-for-build@main
+        with:
+          pantheon-machine-token: ${{ secrets.TERMINUS_TOKEN }}
+          site-name: devrel-wait-for-build
+          clear-cache: 'true'
