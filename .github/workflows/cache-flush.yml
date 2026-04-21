@@ -3,6 +3,8 @@ name: Wait for Pantheon build and clear cache
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   wait-and-flush:
