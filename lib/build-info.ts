@@ -6,8 +6,8 @@
 export type BuildInfo = { commitHash: string; commitShort: string; buildTime: string; buildYear: number }
 
 export const BUILD_INFO: BuildInfo = {
-  commitHash: '2db07414fffde3b0c40d9f45c5b08cc5ee9e5629',
-  commitShort: '2db0741',
-  buildTime: '2026-04-21T17:21:35.096Z',
+  commitHash: '94078c2b313310bde98f3fd29e947d78122d199d',
+  commitShort: '94078c2',
+  buildTime: '2026-04-21T18:06:50.842Z',
   buildYear: 2026,
 }

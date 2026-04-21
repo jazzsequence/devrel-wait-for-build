@@ -21,7 +21,6 @@ async function getPost(slug: string): Promise<WPPost | null> {
   }
 }
 
-// Receives the params Promise directly so it can be awaited inside the Suspense boundary
 async function PostContent({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const post = await getPost(slug)
@@ -33,21 +32,21 @@ async function PostContent({ params }: { params: Promise<{ slug: string }> }) {
 
   return (
     <article>
-      <header className="mb-8">
-        <time className="text-gray-500 dark:text-gray-400 text-sm font-mono block mb-3">
+      <header style={{ marginBottom: '2rem' }}>
+        <time className="pds-overline-text pds-overline-text--sm" style={{ display: 'block', marginBottom: '0.5rem' }}>
           {format(new Date(post.date), 'MMMM d, yyyy')}
         </time>
-        <h1 className="text-3xl font-bold mb-6 leading-snug">
+        <h1 className="pds-ts-3xl pds-fw-bold" style={{ marginBottom: '1.5rem' }}>
           {decodeHtmlEntities(post.title.rendered)}
         </h1>
         {hasImage && (
-          <div className="relative w-full h-64 sm:h-96 rounded-xl overflow-hidden mb-8">
+          <div style={{ position: 'relative', width: '100%', height: '400px', borderRadius: '0.5rem', overflow: 'hidden', marginBottom: '2rem' }}>
             <Image
               src={normalizeWordPressUrl(featuredMedia.source_url)}
               alt={featuredMedia.alt_text || decodeHtmlEntities(post.title.rendered)}
               fill
               priority
-              className="object-cover"
+              style={{ objectFit: 'cover' }}
               sizes="(max-width: 768px) 100vw, 768px"
             />
           </div>
@@ -62,16 +61,28 @@ async function PostContent({ params }: { params: Promise<{ slug: string }> }) {
   )
 }
 
+function PostSkeleton() {
+  const bar = (w: string, h: string) => (
+    <div className="pds-shimmer" style={{ width: w, height: h, borderRadius: '4px' }} />
+  )
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      {bar('60%', '2.5rem')}
+      {bar('100%', '24rem')}
+      {bar('100%', '1rem')}
+      {bar('100%', '1rem')}
+      {bar('80%', '1rem')}
+    </div>
+  )
+}
+
 export default function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   return (
-    <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
-      <Link
-        href="/"
-        className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 mb-8 inline-block transition-colors"
-      >
+    <main className="pds-container pds-container--narrow" style={{ padding: '3rem 1.5rem' }}>
+      <Link href="/" className="pds-ts-s" style={{ display: 'inline-block', marginBottom: '2rem' }}>
         ← All posts
       </Link>
-      <Suspense fallback={<p className="text-gray-500 mt-8">Loading post…</p>}>
+      <Suspense fallback={<PostSkeleton />}>
         <PostContent params={params} />
       </Suspense>
     </main>

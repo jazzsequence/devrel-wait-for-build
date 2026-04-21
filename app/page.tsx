@@ -23,22 +23,14 @@ export default async function Home() {
   const { posts, error } = await getPosts()
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <header className="mb-10">
-        <h1 className="text-4xl font-bold mb-2">jazzsequence.com</h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Latest posts via the WordPress REST API
-        </p>
+    <main className="pds-container pds-container--x-wide" style={{ padding: '3rem 1.5rem' }}>
+      <header style={{ marginBottom: '2.5rem' }}>
+        <h1 className="pds-ts-3xl pds-fw-bold pds-mar-block-end-s">Latest Posts</h1>
+        <p className="pds-ts-m">Pulled live from jazzsequence.com via the WordPress REST API</p>
       </header>
 
-      {error && (
-        <p className="text-red-600 dark:text-red-400 mb-6">{error}</p>
-      )}
-
-      {!error && posts.length === 0 && (
-        <p className="text-gray-500">No posts found.</p>
-      )}
-
+      {error && <p style={{ color: 'var(--pds-color-text-critical, red)' }}>{error}</p>}
+      {!error && posts.length === 0 && <p className="pds-ts-m">No posts found.</p>}
       {!error && posts.length > 0 && <PostsList posts={posts} />}
     </main>
   )
