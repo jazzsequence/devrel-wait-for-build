@@ -9,7 +9,8 @@ The site itself pulls blog posts from jazzsequence.com via the WordPress REST AP
 ## Tech stack
 
 - **Next.js 16** with Turbopack and App Router
-- **React 19**, TypeScript 5, Tailwind CSS 4
+- **React 19**, TypeScript 6
+- **`@pantheon-systems/pds-toolkit-react`** — Pantheon Design System components and CSS utilities
 - **`@pantheon-systems/nextjs-cache-handler`** — dual handler setup:
   - `cacheHandler.ts` → ISR and fetch cache (legacy)
   - `use-cache-handler.ts` → `'use cache'` directive (Next.js 16)
@@ -52,14 +53,24 @@ The client (`lib/wordpress/client.ts`) handles:
 
 Images are served from DigitalOcean Spaces (`sfo2.digitaloceanspaces.com/cdn.jazzsequence/**`) — `next.config.ts` has the `remotePatterns` entry for this.
 
+## Design system
+
+UI uses `@pantheon-systems/pds-toolkit-react`. Two rules that aren't obvious:
+
+1. **Client-only** — PDS calls `createContext` at module initialization, which fails in the RSC runtime. Every file that imports a PDS component must have `'use client'` at the top.
+2. **Suspense required for `new Date()`** — PDS's `SiteFooter` calls `new Date()` at render time. Next.js 16 with `cacheComponents` requires client components doing this to be wrapped in `<Suspense>`. Both `<SiteHeader>` and `<Footer>` in `app/layout.tsx` are wrapped for this reason.
+
+The PDS `Navbar` component was intentionally excluded — it requires `OverlayContextProvider` as an ancestor, but that provider isn't exported from the public API. Use `SiteHeader` (which uses `PantheonLogo`) instead.
+
 ## CI/CD
 
-`.github/workflows/cache-flush.yml` triggers on every push to `main`:
+`.github/workflows/cache-flush.yml` triggers on pushes to `main` and on pull requests:
 
 1. Invokes `jazzsequence/pantheon-wait-for-build@main`
 2. The action authenticates via `TERMINUS_TOKEN`, polls until the Pantheon build for the pushed commit completes, then flushes the GCDN edge cache
+3. For PRs, the environment is auto-detected as `pr-{number}`
 
-**Required GitHub secret:** `TERMINUS_TOKEN` — a Pantheon machine token with access to the `devrel-wait-for-build` site.
+**Required secret:** `TERMINUS_TOKEN` must be set in **both** GitHub repository secrets and Dependabot secrets. Without the Dependabot entry, Dependabot PR pipelines will fail to authenticate.
 
 Dependabot keeps npm and GitHub Actions dependencies updated weekly.
 
